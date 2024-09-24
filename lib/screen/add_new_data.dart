@@ -1,8 +1,19 @@
+import 'package:crud/firebase_database/database_methods.dart';
+import 'package:crud/ulils/show_toasts.dart';
 import 'package:flutter/material.dart';
+import 'package:random_string/random_string.dart';
 
-class AddNewDataScreen extends StatelessWidget {
+class AddNewDataScreen extends StatefulWidget {
   const AddNewDataScreen({super.key});
 
+  @override
+  State<AddNewDataScreen> createState() => _AddNewDataScreenState();
+}
+
+class _AddNewDataScreenState extends State<AddNewDataScreen> {
+  TextEditingController nameController = TextEditingController();
+  TextEditingController professionController = TextEditingController();
+  TextEditingController ageController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,8 +44,9 @@ class AddNewDataScreen extends StatelessWidget {
               decoration: BoxDecoration(
                   border: Border.all(),
                   borderRadius: BorderRadius.circular(10.0)),
-              child: const TextField(
-                decoration: InputDecoration(
+              child: TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                 ),
               ),
@@ -52,8 +64,9 @@ class AddNewDataScreen extends StatelessWidget {
               decoration: BoxDecoration(
                   border: Border.all(),
                   borderRadius: BorderRadius.circular(10.0)),
-              child: const TextField(
-                decoration: InputDecoration(
+              child: TextField(
+                controller: professionController,
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                 ),
               ),
@@ -71,9 +84,10 @@ class AddNewDataScreen extends StatelessWidget {
               decoration: BoxDecoration(
                   border: Border.all(),
                   borderRadius: BorderRadius.circular(10.0)),
-              child: const TextField(
+              child: TextField(
+                controller: ageController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                 ),
               ),
@@ -87,7 +101,22 @@ class AddNewDataScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 child: InkWell(
-                  onTap: () {},
+                  onTap: () async {
+                    String id = randomAlphaNumeric(8);
+                    Map<String, dynamic> userData = {
+                      "Name": nameController.text,
+                      "Profession": professionController.text,
+                      "Id": id,
+                      "Age": ageController.text,
+                    };
+                    await DatabaseMethods()
+                        .addUserData(userData, id)
+                        .then((value) {
+                      ShowToasts()
+                          .getToast("Data Saved Successfully", Colors.green);
+                    });
+                    Navigator.pop(context);
+                  },
                   child: const Text(
                     "Add User",
                     style: TextStyle(
